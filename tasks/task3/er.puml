@@ -1,0 +1,84 @@
+@startuml
+title ER-диаграмма системы "Тёплый дом"
+
+entity "Пользователь (User)" as User {
+    + userId : String <<PK>>
+    + fullName : String
+    + email : String <<unique>>
+    + password : String
+    + phoneNumber : String
+    + role : String
+    + createdAt : DateTime
+    + updatedAt : DateTime
+}
+
+entity "Дом (House)" as House {
+    + houseId : String <<PK>>
+    + ownerId : String <<FK>> 
+    + address : String
+    + createdAt : DateTime
+    + updatedAt : DateTime
+}
+
+entity "Устройство (Device)" as Device {
+    + deviceId : String <<PK>>
+    + houseId : String <<FK>>
+    + deviceTypeId : String <<FK>>
+    + ecosystemId : String <<FK>>
+    + serialNumber : String
+    + status : String
+    + createdAt : DateTime
+    + updatedAt : DateTime
+}
+
+entity "Тип устройства (DeviceType)" as DeviceType {
+    + deviceTypeId : String <<PK>>
+    + name : String
+    + description : String
+    + protocols : List<String>
+    + createdAt : DateTime
+    + updatedAt : DateTime
+}
+
+entity "Модуль (Module)" as Module {
+    + moduleId : String <<PK>>
+    + deviceId : String <<FK>>
+    + name : String
+    + parameters : Map<String, Object>
+    + createdAt : DateTime
+    + updatedAt : DateTime
+}
+
+entity "Телеметрия (TelemetryData)" as TelemetryData {
+    + telemetryId : String <<PK>>
+    + deviceId : String <<FK>>
+    + timestamp : DateTime
+    + data : Map<String, Object>
+}
+
+entity "Команда (DeviceCommand)" as DeviceCommand {
+    + commandId : String <<PK>>
+    + deviceId : String <<FK>>
+    + action : String
+    + parameters : Map<String, Object>
+    + status : String
+    + createdAt : DateTime
+}
+
+entity "Экосистема устройства (EcosystemDevice)" as EcosystemDevice {
+    + ecosystemId : String <<PK>>
+    + name : String
+    + status : String
+    + timestamp : DateTime
+}
+
+' Связи
+User ||--o{ House : "владеет"
+House ||--o{ Device : "содержит"
+DeviceType ||--o{ Device : "обеспечивает"
+Device ||--o{ Module : "содержит"
+Device ||--o{ TelemetryData : "генерирует"
+Device ||--o{ DeviceCommand : "принимает"
+EcosystemDevice ||--o{ Device : "содержит"
+
+@enduml

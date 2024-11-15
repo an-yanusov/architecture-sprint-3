@@ -1,0 +1,53 @@
+@startuml
+title SmartHome Container Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+LAYOUT_WITH_LEGEND()
+
+Person(user, "Пользователь", "Управляет устройствами через веб/мобильное приложение.")
+Person(admin, "Администратор", "Управляет системой через веб-интерфейс.")
+System(SmartHomeSystem, "Эко-система Тёплого дома")
+
+Container_Boundary(SmartHomeSystem, "SmartHome System") {
+    Container(apiGateway, "API Gateway", "Java", "Маршрутизация запросов к микросервисам и аутентификация.")
+    Container(deviceManagementService, "Управление Устройствами", "Java", "Регистрация, управление и настройка устройств.")
+    Container(dataCollectionService, "Сбор Данных", "Java", "Сбор данных с устройств и их сохранение.")
+    Container(commandExecutionService, "Исполнение Команд", "Java", "Обработка команд и управление устройствами.")
+    Container(userManagementService, "Пользователи", "Java", "Управление учетными записями и аутентификация пользователей.")
+    Container(dataBus, "Шина данных (Kafka)", "Message Queue", "Асинхронная передача сообщений между микросервисами.")
+    Container(db1, "База данных Устройств", "Postgres", "Хранение информации о устройствах.")
+    Container(db2, "База данных Пользователей", "Postgres", "Хранение информации о пользователях.")
+    Container(executerService, "Интеграционный слой взаимодействия с устройствами", "Java", "Исполнение команд на устройствах через внешнее API, протоколы обмена, (Adapters). А также получение информации с устройств (Facade).")
+}
+
+System_Ext(api, "Экосистема устройств", "Внешнее API для интеграции устройств.")
+System_Ext(devices, "Устройства", "Внешнее API для интеграции устройств.")
+
+Rel(admin, apiGateway, "Использует")
+Rel(user, apiGateway, "Использует")
+Rel(apiGateway, deviceManagementService, "Отправляем запросы на")
+Rel(apiGateway, dataCollectionService, "Отправляем запросы на")
+Rel(apiGateway, commandExecutionService, "Отправляем запросы на")
+Rel(apiGateway, userManagementService, "Отправляем запросы на")
+
+Rel(deviceManagementService, db1, "Считывает/записывает данные")
+Rel(dataCollectionService, db1, "Считывает данные от устройств")
+Rel(commandExecutionService, db1, "Отправляет команды устройствам через шину данных")
+
+Rel(deviceManagementService, dataBus, "Отправляет события")
+Rel(dataCollectionService, dataBus, "Отправляет события")
+Rel(commandExecutionService, dataBus, "Подписывается и обрабатывает команды")
+
+Rel(dataBus, executerService, "Считывает команды устройствам через шину данных")
+Rel(executerService, dataBus, "Записывает команды от устройств в шину данных")
+
+Rel(executerService, api, "Отправляет команды устройствам через внешнее API")
+Rel(api, executerService, "Команды/показания от устройств через внешнее API")
+
+Rel(executerService, devices, "Отправляет команды устройствам через поддерживаемые протоколы")
+Rel(devices, executerService, "Телемитрия от устройств через поддерживаемые протоколы")
+
+Rel(userManagementService, db2, "Считывает/записывает данные")
+@enduml

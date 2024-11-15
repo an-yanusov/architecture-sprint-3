@@ -1,0 +1,53 @@
+@startuml
+title AdapterService - Diagram Code
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+class AdapterService {
+    +void sendCommand(DeviceCommand command)
+    +DeviceStatus getDeviceStatus(String deviceId)
+    +void registerDevice(Device device)
+    -void handleProtocolSpecificCommands(DeviceCommand command)
+}
+
+class DeviceCommand {
+    +String deviceId
+    +String action
+    +Map<String, Object> parameters
+}
+
+class DeviceStatus {
+    +String deviceId
+    +String status
+    +Map<String, Object> metrics
+}
+
+interface DeviceProtocol {
+    +void executeCommand(DeviceCommand command)
+    +DeviceStatus fetchStatus(String deviceId)
+}
+
+class HttpProtocolAdapter implements DeviceProtocol {
+    +void executeCommand(DeviceCommand command)
+    +DeviceStatus fetchStatus(String deviceId)
+}
+
+class MqttProtocolAdapter implements DeviceProtocol {
+    +void executeCommand(DeviceCommand command)
+    +DeviceStatus fetchStatus(String deviceId)
+}
+
+class CoapProtocolAdapter implements DeviceProtocol {
+    +void executeCommand(DeviceCommand command)
+    +DeviceStatus fetchStatus(String deviceId)
+}
+
+AdapterService -- "1" DeviceCommand : "принимает"
+AdapterService -- "1" DeviceStatus : "возвращает"
+AdapterService --> DeviceProtocol : "использует"
+DeviceProtocol <|.. HttpProtocolAdapter : "реализует"
+DeviceProtocol <|.. MqttProtocolAdapter : "реализует"
+DeviceProtocol <|.. CoapProtocolAdapter : "реализует"
+@enduml
