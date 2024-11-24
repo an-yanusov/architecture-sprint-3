@@ -1,5 +1,6 @@
 @startuml
-!include C4_Context.puml
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Context.puml
+LAYOUT_WITH_LEGEND()
 
 title SmartHome
 

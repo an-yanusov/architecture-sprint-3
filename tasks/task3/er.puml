@@ -14,10 +14,15 @@ entity "Пользователь (User)" as User {
 
 entity "Дом (House)" as House {
     + houseId : String <<PK>>
-    + ownerId : String <<FK>> 
     + address : String
     + createdAt : DateTime
     + updatedAt : DateTime
+}
+
+' Перечисление для статуса устройства
+enum DeviceStatus {
+    ON
+    OFF
 }
 
 entity "Устройство (Device)" as Device {
@@ -26,7 +31,7 @@ entity "Устройство (Device)" as Device {
     + deviceTypeId : String <<FK>>
     + ecosystemId : String <<FK>>
     + serialNumber : String
-    + status : String
+    + status : DeviceStatus
     + createdAt : DateTime
     + updatedAt : DateTime
 }
@@ -53,7 +58,7 @@ entity "Телеметрия (TelemetryData)" as TelemetryData {
     + telemetryId : String <<PK>>
     + deviceId : String <<FK>>
     + timestamp : DateTime
-    + data : Map<String, Object>
+    + data : Integer
 }
 
 entity "Команда (DeviceCommand)" as DeviceCommand {
@@ -72,8 +77,14 @@ entity "Экосистема устройства (EcosystemDevice)" as Ecosyste
     + timestamp : DateTime
 }
 
+entity "Связь Пользователь-Дом (UserHouse)" as UserHouse {
+    + userId : String <<FK>> 
+    + houseId : String <<FK>>
+}
+
 ' Связи
-User ||--o{ House : "владеет"
+User ||--o{ UserHouse : "владеет"
+House ||--o{ UserHouse : "принадлежит"
 House ||--o{ Device : "содержит"
 DeviceType ||--o{ Device : "обеспечивает"
 Device ||--o{ Module : "содержит"
