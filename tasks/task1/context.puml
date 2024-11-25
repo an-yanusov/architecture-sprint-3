@@ -1,0 +1,17 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Context.puml
+LAYOUT_WITH_LEGEND()
+
+title SmartHome
+
+Person(user, "User", "A user of the fitness club system")
+Person(admin, "Administrator", "An administrator managing the system")
+System(SmartHomeSystem, "SmartHome System", "System managing sensors, temperature, scenarios")
+
+System_Ext(api, "Ecosystem of device", "External API for device integration")
+
+Rel(user, SmartHomeSystem, "Uses the system")
+Rel(admin,SmartHomeSystem,"Manages the system")
+Rel(SmartHomeSystem,api,"Fetches device data")
+
+@enduml 

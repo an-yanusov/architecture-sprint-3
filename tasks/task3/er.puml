@@ -1,0 +1,95 @@
+@startuml
+title ER-диаграмма системы "Тёплый дом"
+
+entity "Пользователь (User)" as User {
+    + userId : String <<PK>>
+    + fullName : String
+    + email : String <<unique>>
+    + password : String
+    + phoneNumber : String
+    + role : String
+    + createdAt : DateTime
+    + updatedAt : DateTime
+}
+
+entity "Дом (House)" as House {
+    + houseId : String <<PK>>
+    + address : String
+    + createdAt : DateTime
+    + updatedAt : DateTime
+}
+
+' Перечисление для статуса устройства
+enum DeviceStatus {
+    ON
+    OFF
+}
+
+entity "Устройство (Device)" as Device {
+    + deviceId : String <<PK>>
+    + houseId : String <<FK>>
+    + deviceTypeId : String <<FK>>
+    + ecosystemId : String <<FK>>
+    + serialNumber : String
+    + status : DeviceStatus
+    + createdAt : DateTime
+    + updatedAt : DateTime
+}
+
+entity "Тип устройства (DeviceType)" as DeviceType {
+    + deviceTypeId : String <<PK>>
+    + name : String
+    + description : String
+    + protocols : List<String>
+    + createdAt : DateTime
+    + updatedAt : DateTime
+}
+
+entity "Модуль (Module)" as Module {
+    + moduleId : String <<PK>>
+    + deviceId : String <<FK>>
+    + name : String
+    + parameters : Map<String, Object>
+    + createdAt : DateTime
+    + updatedAt : DateTime
+}
+
+entity "Телеметрия (TelemetryData)" as TelemetryData {
+    + telemetryId : String <<PK>>
+    + deviceId : String <<FK>>
+    + timestamp : DateTime
+    + data : Integer
+}
+
+entity "Команда (DeviceCommand)" as DeviceCommand {
+    + commandId : String <<PK>>
+    + deviceId : String <<FK>>
+    + action : String
+    + parameters : Map<String, Object>
+    + status : String
+    + createdAt : DateTime
+}
+
+entity "Экосистема устройства (EcosystemDevice)" as EcosystemDevice {
+    + ecosystemId : String <<PK>>
+    + name : String
+    + status : String
+    + timestamp : DateTime
+}
+
+entity "Связь Пользователь-Дом (UserHouse)" as UserHouse {
+    + userId : String <<FK>> 
+    + houseId : String <<FK>>
+}
+
+' Связи
+User ||--o{ UserHouse : "владеет"
+House ||--o{ UserHouse : "принадлежит"
+House ||--o{ Device : "содержит"
+DeviceType ||--o{ Device : "обеспечивает"
+Device ||--o{ Module : "содержит"
+Device ||--o{ TelemetryData : "генерирует"
+Device ||--o{ DeviceCommand : "принимает"
+EcosystemDevice ||--o{ Device : "содержит"
+
+@enduml

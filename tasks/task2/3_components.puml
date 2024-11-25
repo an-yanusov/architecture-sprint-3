@@ -1,0 +1,37 @@
+@startuml
+title Интеграционный слой взаимодействия с устройствами - Диаграмма компонентов
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+LAYOUT_WITH_LEGEND()
+
+Container(dataBus, "Брокер очередей", "Kafka")
+
+
+
+Container_Boundary(executerServiceBoundary, "Управляющий слой интеграционного слоя") {
+    Component(facadeManagerService, "Сервис для обработки данных от устройств", "Java", "Упрощает взаимодействие с устройствами, обеспечивая единый интерфейс для всех пришедших данных.")
+    Component(adapterManagerService, "Сервис для единого управления типом и протоколом взаимодействия с устройствами")
+}
+
+Container_Boundary(IntegrationServices, "Интеграционный слой взаимодействия с устройствами") {
+    Component(facadeService, "Фасад для получения данных телемитрии с устройств", "Java", "Получение телеметрии с устройств через внешнее API, протоколы обмена.")
+    Component(adapterService, "Адаптер для взаимодействия с устройствами", "Java", "Исполнение команд на устройствах через внешнее API, протоколы обмена.")
+}
+
+System_Ext(api, "Экосистема устройств", "Внешнее API для интеграции устройств.")
+System_Ext(devices, "Устройства", "Внешние устройства, поддерживающие интеграцию.")
+
+Rel(adapterManagerService, dataBus, "1. Считывание команд на взаимодействие с устройствами")
+Rel(adapterManagerService, adapterService, "2. Отправка команд на устройства")
+
+Rel(adapterService, api, "3. Отправляет команды")
+Rel(adapterService, devices, "4. Отправляет команды через поддерживаемые протоколы")
+
+Rel(api, facadeService, "5. Получает команды")
+Rel(devices, facadeService, "6. Получает команды через поддерживаемые протоколы")
+
+Rel(facadeService, facadeManagerService, "7. Передаёт команду от устройства в сервис для обработки")
+Rel(facadeManagerService, dataBus, "8. Публикует команду/данные от устройства в шину для потребителей")
+@enduml
